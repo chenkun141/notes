@@ -1,7 +1,8 @@
-## Redis原理详解 ##
+# Redis #
+## 参考资料 ##
+[https://juejin.im/post/5b4dd82ee51d451925629622#heading-63](https://juejin.im/post/5b4dd82ee51d451925629622#heading-63)  
 
-
-### 数据类型 ###
+## 数据类型 ##
 Redis最为常用的数据类型主要有以下五种：
 
 - String
@@ -43,5 +44,21 @@ Redis最为常用的数据类型主要有以下五种：
 	2. 使用场景：Redis sorted set的使用场景与set类似，区别是set不是自动有序的，而sorted set可以通过用户额外提供一个优先级(score)的参数来为成员排序，并且是插入有序的，即自动排序。当你需要一个有序的并且不重复的集合列表，那么 可以选择sorted set数据结构，比如twitter 的public timeline可以以发表时间作为score来存储，这样获取时就是自动按时间排好序的。
 	3. 实现方式：Redis sorted set的内部使用HashMap和跳跃表(SkipList)来保证数据的存储和有序，HashMap里放的是成员到score的映射，而跳跃表里存放的 是所有的成员，排序依据是HashMap里存的score,使用跳跃表的结构可以获得比较高的查找效率，并且在实现上比较简单。
 
+## Redis集群 ##
+### redis-cluster 架构图 ###
+ ![](https://i.imgur.com/Q8mp51D.png)  
 
- 
+架构细节:  
+
+1. 所有的redis节点彼此互联(PING-PONG机制),内部使用二进制协议优化传输速度和带宽.
+2. 节点的fail是通过集群中超过半数的节点检测失效时才生效.
+3. 客户端与redis节点直连,不需要中间proxy层.客户端不需要连接集群所有节点,连接集群中任何一个可用节点即可
+4. redis-cluster把所有的物理节点映射到[0-16383]slot上,cluster 负责维护node<->slot<->value
+Redis 集群中内置了 16384 个哈希槽，当需要在 Redis 集群中放置一个 key-value 时，redis 先对 key 使用 crc16 算法算出一个结果，然后把结果对 16384 求余数，这样每个 key 都会对应一个编号在 0-16383 之间的哈希槽，redis 会根据节点数量大致均等的将哈希槽映射到不同的节点.
+
+### redis-cluster 投票 容错 ###
+![](https://i.imgur.com/Kjm7xJm.png)  
+1. 集群中所有master参与投票,如果半数以上master节点与其中一个master节点通信超过(cluster-node-timeout),认为该master节点挂掉.
+2. 什么时候整个集群不可用(cluster_state:fail)?
+	- 如果集群任意master挂掉,且当前master没有slave，则集群进入fail状态。也可以理解成集群的[0-16383]slot映射不完全时进入fail状态。
+	- 如果集群超过半数以上master挂掉，无论是否有slave，集群进入fail状态。

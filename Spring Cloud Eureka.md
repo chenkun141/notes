@@ -100,7 +100,7 @@ Eureka Server源码分析:[https://www.jianshu.com/p/2fc7cf7264ca](https://www.j
   一个分布式系统不可能同时满足C(一致性),A(可用性),P(分区容错性).由于分区容错性在分布式系统中必须要保证的,因此我们执行在A和C之间进行权衡.因此Zookeeper保证的是CP,而Eureka则是AP.  
 
 - **Zookeeper保证CP**   
-   在注册中心查询服务列表时,我们可以容忍注册中心返回的是几分钟以前的注册信息,但不能接受服务直接down掉不可用.也就是说,服务注册功能对可用性的要求要高于一致性.但是Zookeeper会出现这样一种情况,当master节点因为网络故障与气压节点失去联系时,剩余节点会重新进行leader选举.问题在于,选举leader的时间太长,30~120s,且选举期间整个Zookeeper集群都是不可用的,这就单只在选举期间注册服务瘫痪.在云部署的环境下,因网络问题使得Zookeeper集群失去master节点是交大概率会发生的事,虽然服务能够最终恢复,但是漫长的选举时间导致的注册长期不可用是不能容忍的.
+   在注册中心查询服务列表时,我们可以容忍注册中心返回的是几分钟以前的注册信息,但不能接受服务直接down掉不可用.也就是说,服务注册功能对可用性的要求要高于一致性.但是Zookeeper会出现这样一种情况,当master节点因为网络故障与其他节点失去联系时,剩余节点会重新进行leader选举.问题在于,选举leader的时间太长,30~120s,且选举期间整个Zookeeper集群都是不可用的,这就单只在选举期间注册服务瘫痪.在云部署的环境下,因网络问题使得Zookeeper集群失去master节点是交大概率会发生的事,虽然服务能够最终恢复,但是漫长的选举时间导致的注册长期不可用是不能容忍的.
 
 - **Eureka保证AP**  
    Eureka在设计师优先保证可用性,Eureke各个节点都是平等的,几个节点挂掉不会影响正常节点的工作,剩余节点依然可以提供注册和查询服务.而Eureka的客户端在向某个Eureka注册是如果发现连接失败,则会自动切换至其它节点,只要有一台Eureka还在,就能保证注册服务可用(保证可用性),只不过查到的信息可能不是最新的(不保证强一致性),除此之外,Eureka还有一个自我保护机制,如果在15分钟内超过85%的节点都没有正常的心跳,那么Eureka就认为客户端与注册中心出现了网络故障,此时会出现以下几种情况:  
@@ -121,20 +121,18 @@ Eureka Server源码分析:[https://www.jianshu.com/p/2fc7cf7264ca](https://www.j
 		        <groupId>org.springframework.cloud</groupId>
 		        <artifactId>spring-cloud-starter-openfeign</artifactId>
 		    </dependency>
-
-
-
-2. 在服务消费者启动类上加@EnableFeignClients注解,如果你的Feign接口定义跟你的启动类不在一个包名下,需要制定扫描的包名@EnableFeignClients(basePackages="com.xxx.xxx.xxx")
+2. 在服务消费者启动类上加@EnableFeignClients注解,如果你的Feign接口定义跟你的启动类不在一个包名下,需要制定扫描的包名
 	
-			@SpringBootApplication
-			@EnableDiscoveryClient
-			@EnableFeignClients
-			public class FeignApplication {
-			
-				public static void main(String[] args) {
-					SpringApplication.run(FeignApplication.class, args);
+			@EnableFeignClients(basePackages="com.xxx.xxx.xxx")
+				@SpringBootApplication
+				@EnableDiscoveryClient
+				@EnableFeignClients
+				public class FeignApplication {
+				
+					public static void main(String[] args) {
+						SpringApplication.run(FeignApplication.class, args);
+					}
 				}
-			}
 3. application.yml文件配置(参考Service Discovery: Eureka Clients(服务提供者)application.yml文件配置)
  
 			eureka:

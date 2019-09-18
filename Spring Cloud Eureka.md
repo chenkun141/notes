@@ -86,6 +86,7 @@ Eureka Server源码分析:[https://www.jianshu.com/p/2fc7cf7264ca](https://www.j
   spring.application.name,这个是以后服务与服务之间相互调用的name
 
 ### 功能总结 ###
+服务实例主要有UP,DOWN,STARTING,OUT_OF_SERVICE,UNKNUWN这几个状态.其中OUT_OF_SERVICE标识停止服务,即停止接收请求,处于这个状态的服务实例将不会被路由到,经常用于升级部署的场景.
 #### Eureka Server ####
 - Server给Client提供注册功能,所有的实例保存在一个双重map中,注册后,Server会将数据复制到配置的同伴节点
 - Client从Server获取的服务列表的是通过http请求server的ApplicationsResource#getContainers()方法获取所有的服务列表,而这个服务列表更新时间是30秒

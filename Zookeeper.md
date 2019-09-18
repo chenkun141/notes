@@ -10,6 +10,7 @@ ZooKeeper是一个开源的分布式服务协调组件,是Google Chubby的开源
 #### 角色 ####
 ZooKeeper集群中的所有机器通过一个Leader 选举过程来选定一台称为 “Leader” 的机器，Leader 既可以为客户端提供写服务又能提供读服务。除了 Leader 外，Follower 和 Observer 都只能提供读服务。Follower 和 Observer 唯一的区别在于 Observer 机器不参与 Leader 的选举过程，也不参与写操作的“过半写成功”策略，因此 Observer 机器可以在不影响写性能的情况下提升集群的读性能。  
 ![](https://i.imgur.com/lkzz5ED.png)  
+
 - 领导者(leader)  
 	1. 事务请求的唯一调度和处理者,保证集群事务处理的顺序性;
 	2. 集群内部各服务器的调度者

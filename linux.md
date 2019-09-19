@@ -1,6 +1,14 @@
 ## 常用Linux命令 ##
 ### 参考资料 ###
 [https://juejin.im/post/5ac04f206fb9a028d1413bf2](https://juejin.im/post/5ac04f206fb9a028d1413bf2)
+
+### java 相关命令 ###
+后台运行，并将相关日志输出到registercenter.log
+
+	java -jar liguregistercenter-1.0.1-SNAPSHOT.jar >/data/project/ligusports/logs/registercenter/registercenter.log &
+
+
+
 ### 1.查找文件 ###
 根据名称查找/目录下的filename.txt文件。
 	

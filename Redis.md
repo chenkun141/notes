@@ -64,10 +64,11 @@ Redis 集群中内置了 16384 个哈希槽，当需要在 Redis 集群中放置
 	- 如果集群超过半数以上master挂掉，无论是否有slave，集群进入fail状态。
 
 ### reids的持久化 ###
-[https://segmentfault.com/a/1190000015983518?utm_source=tag-newest](https://segmentfault.com/a/1190000015983518?utm_source=tag-newest)  
+[https://segmentfault.com/a/1190000015983518?utm_source=tag-newest](https://segmentfault.com/a/1190000015983518?utm_source=tag-newest) 
+[http://redisdoc.com/topic/persistence.html](http://redisdoc.com/topic/persistence.html) 
 #### 持久化方式 ####
 
-- RDB:在指定的时间间断能对你的数据进行快照存储(RDB是快照文件的方式,redis通过执行save/bgsave命令,执行数据的备分,将redis当前的数据保存到*.rdb文件中,文件保存了所有的数据集合)
+- RDB(point-in-time snapshot):在指定的时间间断能对你的数据进行快照存储(RDB是快照文件的方式,redis通过执行save/bgsave命令,执行数据的备分,将redis当前的数据保存到*.rdb文件中,文件保存了所有的数据集合)
 - AOF:记录每次对服务器写的操作,当服务器重启的时候会重新执行这些命令来恢复原始的数据(AOF是服务器通过读取配置,在指定的时间里,追加redis写操作的命令到*.aof文件中,是一种增量的持久化方式.) 
  
 #### 持久化的配置 ####

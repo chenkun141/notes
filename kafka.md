@@ -51,3 +51,23 @@ push 模式很难适应消费速率不同的消费者，因为消息发送速率
 
 对于 Kafka 而言，pull 模式更合适。pull 模式可简化 broker 的设计，Consumer 可自主控制消费消息的速率，同时 Consumer 可以自己控制消费方式——即可批量消费也可逐条消费，同时还能选择不同的提交方式从而实现不同的传输语义。
 
+### kafka数据存储设计 ###
+#### partition的数据文件(offset,messageSize,data) ####
+partition中的每条Message包含了一下三个属性:offset,MessageSize,data,其中offset表示Message在这个partition中的偏移量,offset不是该Message在partition数据文件中的实际存储位置,而是逻辑上一个值,它唯一确定了partition中的一条Message的具体内容.
+#### 数据文件分段(顺序读写,分段命令,二分查找) ####
+partition物理上由多个segment文件组成,每个segment大小相等,顺序读写,每个segment数据文件以该段中最小的offset命名,文件扩展名为.log.这样在查找指定offset的Message的时候,用二分查找就可以定位到该Message在哪个segment数据文件中.
+#### 数据文件索引(分段索引,稀疏存储) ####
+kafka为每个分段后的数据文件建立了索引文件,文件名与数据文件的名字是一样的,只是文件扩展名为.index.index文件中并没有为数据文件中的每条Message建立索引,而是采用了稀疏存储的方式,每隔一定字节的数据建立一条索引.这样避免了索引文件占用过多的空间,从而可以将索引文件保留在内存中.
+![](https://i.imgur.com/2o6cb8T.png)
+### 生产者设计 ###
+#### 负载均衡(partition会均衡分布到不同broker上) ####
+由于消息topic由多个partition组成,且partition会均衡分布到不同的broker上,因此,为了有效利用broker集群的性能,提高消息的吞吐量,producer可以通过随机或者hash等方式,将消息平均发送到多个partition上,以实现负载均衡.
+![](https://i.imgur.com/EaQfAmR.png)
+#### 批量发送 ####
+是提高消息吞吐量重要的方式,producer端可以在内存中合并多条消息后,以一次请求的方式发送了批量的消息给broker.从而大大减少broker存储消息的IO操作次数.但也一定程度上影响了消息的实时性,相当于以时延代价,换取更好的吞吐量.
+#### 压缩(Gzip或snappy) ####
+producer端可以通过gzip或snappy格式对消息集合进行压缩.producer端进行压缩之后,在consumer端需进行压缩.压缩的好处就是减少传输的数据量,减轻对网络传输的压力,在对大数据处理上,瓶颈往往体现在网络上而不是CPU(压缩和解压会耗掉部分CPU资源).
+### 消费者设计 ###
+![](https://i.imgur.com/WrO0pJF.png)
+#### consumer group ####
+同一consumer group中的多个consumer实例,不同时消费同一个partition,等效于队列模式.partition内消息是有序的,consumer通过pull方式消费消息,卡法咖不删除已消费的消息,对于partition,顺序读写磁盘数据,以时间复杂度O(1)方式提供消息持久化能力.

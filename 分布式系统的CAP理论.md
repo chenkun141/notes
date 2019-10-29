@@ -1,4 +1,6 @@
 ## 分布式系统的CAP理论 ##
+### 参考网站 ###
+[http://www.hollischuang.com/archives/666](http://www.hollischuang.com/archives/666)
 ### CAP理论概述 ###
 CAP理论 : 一个分布式系统最多只能同时满足一致性(Consisency),可用性(Availability)和分区容错性(Partition tolerance)这三项中的两项.  
 ![](https://i.imgur.com/GCwwR4c.png)

@@ -77,7 +77,9 @@ Elasticsearch启动后,也启动了两个端口9200和9300:
 - Type(类型):文档归属于一种Type,就像是关系数据库中的一个Table
 - Field(字段):每个文档包含多个字段,类似关系数据库中一个Table的列
 
-我们用一个表格来做类比,如下:  
+我们用一个表格来做类比,如下:
+  
+
 |Elasticsearch |	MySQL |  
 |--|--|  
 |Index|	Database|  

@@ -10,91 +10,132 @@ Elasticsearch是一款稳定高效的分布式搜索和分析引擎,它的底层
 
 本文主要介绍Elasticsearch的基本概念和入门使用
 
+## 概念 ##
+在进一步使用Elasticsearch之前,我们先了解几个关键概念.
+
+- **Index(索引):**即索引，索引包含一堆有相似结构的文档数据。一般来讲，我们将数据类似一样或者相近的数据才包装为一个Index。(这个必须小写，也别用下划线开头)
+- **Document(文档):**ES存储内容的基本单位，相当于一条数据（在项目中，它可以是一条订单数据、一条JSON数据等等）。一条条的Document构成了整个的Index.
+- **Type(类型):**对Document的分类，在一个Index中，会根据一些特性的不同，建立不同的Type去进行逻辑数据分类。6.X以后的版本只允许有一个Type，这个需要注意.就像是关系数据库中的一个Table
+- **Field(字段):**每个文档包含多个字段,类似关系数据库中一个Table的列
+- **Shard(分片):**数据分片,一个index可能会存在于多个shard
+- **Node(节点):**node是一个运行这的Elasticsearch实例,一个node就是一个单独的server
+- **Cluster(集群):**cluster是多个node集群
+
+我们用一个表格来做类比,如下:
+	  
+	|Elasticsearch |	MySQL |  
+	|--|--|  
+	|Index|	Database|  
+	|Type|	Table|  
+	|Document|	Row|  
+	|Field	|Column|  
+
+
 ## 安装 ##
-在安装Elasticsearch之前,请确保你的计算机已经安装了Java.目前Elasticsearch 的最新版是5.2,需要安装Java 8,如果你用的是老版本的Elasticsearch ,如2.x版,可用Java 7 ,但还是推荐使用Java 8.
+在安装Elasticsearch之前,请确保你的计算机已经安装了Java.
 
 下载最新版本的Elasticsearch ,使用wget下载,如下:
 
-	wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.2.2.tar.gz
+	wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-7.4.2-linux-x86_64.tar.gz
 
 下载完成后进行解压:
 
-	tar -zxvf elasticsearch-5.2.2.tar.gz
+	tar -xzf elasticsearch-7.4.2-linux-x86_64.tar.gz
 
-## 运行 ##
 首先,我们进入到刚刚解压出来的目录中:
 
-	cd elasticsearch-5.2.2
+	cd elasticsearch-7.4.2/
 
 接着 使用如下命令启动Elasticsearch
 
-	bin/elasticsearch
+	./bin/elasticsearch
 
-此时,如果正常的话,你可以在终端看到类似如下的输出:
-
-	[2017-03-04T23:25:09,961][INFO ][o.e.n.Node               ] [] initializing ...
-	[2017-03-04T23:25:10,073][INFO ][o.e.e.NodeEnvironment    ] [yO11WLM] using [1] data paths, mounts [[/ (/dev/disk0s2)]], net usable_space [141.1gb], net total_space [232.9gb], spins? [unknown], types [hfs]
-	[2017-03-04T23:25:10,074][INFO ][o.e.e.NodeEnvironment    ] [yO11WLM] heap size [1.9gb], compressed ordinary object pointers [true]
-	[2017-03-04T23:25:10,095][INFO ][o.e.n.Node               ] node name [yO11WLM] derived from node ID [yO11WLMOQDuAOpZbYZYjzw]; set [node.name] to override
-	[2017-03-04T23:25:10,100][INFO ][o.e.n.Node               ] version[5.2.2], pid[7607], build[db0d481/2017-02-09T22:05:32.386Z], OS[Mac OS X/10.11.5/x86_64], JVM[Oracle Corporation/Java HotSpot(TM) 64-Bit Server VM/1.8.0_102/25.102-b14]
-	[2017-03-04T23:25:11,363][INFO ][o.e.p.PluginsService     ] [yO11WLM] loaded module [aggs-matrix-stats]
-	...
-
-
-上面的命令是在前台运行的,如果想在后台以守护进程模式运行,可以加**-d**参数.  
-Elasticsearch启动后,也启动了两个端口9200和9300:  
-
-- 9200端口:HTTP RESTFUL接口的通讯端口
-- 9300端口:TCP通讯端口,用于集群间节点通讯和与Java客户端通信的端口
-
-现在,让我们做一些测试.在浏览器访问链接**http://localhost:9200/ **,或使用curl命令:
+测试是否启动成功,打开另一个终端进行测试：访问链接 **http://localhost:9200/**,或使用curl命令:
 
 	curl 'http://localhost:9200/?pretty'
 
 我们可以看到类似如下的输出:
 
 	{
-	  "name" : "yO11WLM",
+	  "name" : "node01",
 	  "cluster_name" : "elasticsearch",
-	  "cluster_uuid" : "yC8BGwzlSnu_zGbKL918Xg",
+	  "cluster_uuid" : "D22e0tvHSyy0_pRQmm03WQ",
 	  "version" : {
-	    "number" : "5.2.1",
-	    "build_hash" : "db0d481",
-	    "build_date" : "2017-02-09T22:05:32.386Z",
+	    "number" : "7.4.2",
+	    "build_flavor" : "default",
+	    "build_type" : "tar",
+	    "build_hash" : "2f90bbf7b93631e52bafb59b3b049cb44ec25e96",
+	    "build_date" : "2019-10-28T20:40:44.881551Z",
 	    "build_snapshot" : false,
-	    "lucene_version" : "6.4.1"
+	    "lucene_version" : "8.2.0",
+	    "minimum_wire_compatibility_version" : "6.8.0",
+	    "minimum_index_compatibility_version" : "6.0.0-beta1"
 	  },
 	  "tagline" : "You Know, for Search"
 	}
 
-## 概念 ##
-在进一步使用Elasticsearch之前,我们先了解几个关键概念.
+可以在配置文件config/elasticsearch.yml 修改name和cluster_name，注意配置中间留空格。修改后重新启动es，可以看到配置的name和cluster.name。
 
-在逻辑层面:
+	{
+	  "name" : "node01",
+	  "cluster_name" : "chenkun",
+	  "cluster_uuid" : "D22e0tvHSyy0_pRQmm03WQ",
+	  "version" : {
+	    "number" : "7.4.2",
+	    "build_flavor" : "default",
+	    "build_type" : "tar",
+	    "build_hash" : "2f90bbf7b93631e52bafb59b3b049cb44ec25e96",
+	    "build_date" : "2019-10-28T20:40:44.881551Z",
+	    "build_snapshot" : false,
+	    "lucene_version" : "8.2.0",
+	    "minimum_wire_compatibility_version" : "6.8.0",
+	    "minimum_index_compatibility_version" : "6.0.0-beta1"
+	  },
+	  "tagline" : "You Know, for Search"
+	}
 
-- Index(索引):这里的Index是名词,一个Index就像是传统关系数据库的Database,它是Elasticsearch用来存储数据的逻辑区域
-- Document(文档):Elasticsearch使用json文档来表示一个对象,就像是关系数据库中一个table中的一行数据
-- Type(类型):文档归属于一种Type,就像是关系数据库中的一个Table
-- Field(字段):每个文档包含多个字段,类似关系数据库中一个Table的列
+### 安装中遇到的错误&解决方案 ###
+1. max file descriptors [4096] for elasticsearch process is too low, increase to at least [65536]  
+原因： 意思是说你的进程不够用了  
+解决方案： 切到root 用户：进入到security目录下的limits.conf；  
+执行命令 vim /etc/security/limits.conf 在文件的末尾添加下面的参数值： 
 
-我们用一个表格来做类比,如下:
-  
+		* soft nofile 65536
+		* hard nofile 131072
+		* soft nproc 2048
+		* hard nproc 4096
 
-|Elasticsearch |	MySQL |  
-|--|--|  
-|Index|	Database|  
-|Type|	Table|  
-|Document|	Row|  
-|Field	|Column|  
+2. max number of threads [3803] for user [es] is too low, increase to at least [4096]  
+原因：意思就是说你的线程数不够用了  
+解决方案： 切到root用户,执行命令 vi /etc/security/limits.d/20-nproc.conf 修改3803为4096:  
 
-在物理层面:
 
-- Node(节点):node是一个运行这的Elasticsearch实例,一个node就是一个单独的server
-- Cluster(集群):cluster是多个node集群
-- Shard(分片):数据分片,一个index可能会存在于多个shard
+		*          soft    nproc     4096
+		root       soft    nproc     unlimited
 
-## 使用 ##
-接下来,我们看看如何建立索引,创建文档等,就好比在Mysql中进行诸如创建数据库,插入数据等操作.
+
+	如果还是失败（大多出现在 Centos7 以上），换下面这种：
+
+		* hard nproc 4096
+		* soft nproc 4096
+		elk soft nproc 4096
+		root soft nproc unlimited
+
+3. max virtual memory areas vm.max_map_count [65530] is too low, increase to at least [262144]  
+原因： 需要修改系统变量的最大值  
+解决方案：切换到 root 用户修改配置 /etc/sysctl.conf 增加配置值：vm.max_map_count=655360  
+执行命令 sysctl -p 这样就可以了，会显示如下信息
+
+		[root@localhost ~]#    sysctl -p
+		vm.max_map_count = 262144
+
+4. system call filters failed to install; check the logs and fix your configuration or disable system call filters at your own risk  
+问题原因：因为Centos6不支持SecComp，而ES5.2.1默认  bootstrap.system_call_filter为true进行检测，所以导致检测失败，失败后直接导致ES不能启动。详见 ：[https://github.com/elastic/elasticsearch/issues/22899](https://github.com/elastic/elasticsearch/issues/22899)  
+解决方法：在elasticsearch.yml中配置bootstrap.system_call_filter为false，注意要在Memory下面:
+
+		bootstrap.memory_lock: false
+		bootstrap.system_call_filter: false
+
 
 ## 添加文档 ##
 下面,我们将创建一个存储电影信息的Document:  
@@ -379,6 +420,8 @@ query string 搜索以**q=field:value**的形式进行查询,比如查询name字
 使用delete方法删除文档:
 
 	http delete :9200/movie/adventure/1
+
+
 
 ## 小结 ##
 - Elasticsearch通过简单的Restful api 来隐藏lucene的复杂性,从而让全文搜索变得简单

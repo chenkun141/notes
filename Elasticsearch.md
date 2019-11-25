@@ -1,5 +1,7 @@
 ## 参考网站 ##
-[https://es.xiaoleilu.com/index.html](https://es.xiaoleilu.com/index.html)
+[https://es.xiaoleilu.com/index.html](https://es.xiaoleilu.com/index.html)  
+[https://www.cnblogs.com/lizichao1991/p/7809156.html](https://www.cnblogs.com/lizichao1991/p/7809156.html)  
+[https://blog.csdn.net/laotoumo/article/details/53890279](https://blog.csdn.net/laotoumo/article/details/53890279)
 ## Elasticsearch入门使用 ##
 Elasticsearch是一款稳定高效的分布式搜索和分析引擎,它的底层基于lucene,并提供了友好的Restful api来对数据进行操作,还有比较重要的一点是,Elasticsearch开箱即可用,上手也比较容易.  
 目前Elasticsearch在搭建企业级搜索(如日志搜索,商品搜索等)平台中很广泛,官网也提供了不少案例,比如:
@@ -8,13 +10,11 @@ Elasticsearch是一款稳定高效的分布式搜索和分析引擎,它的底层
 - eBay使用Elasticsearch搜索海量的商品数据
 - Netflix使用Elasticsearch来实现高效的消息传递系统
 
-本文主要介绍Elasticsearch的基本概念和入门使用
-
 ## 概念 ##
 在进一步使用Elasticsearch之前,我们先了解几个关键概念.
 
-- **Index(索引):**即索引，索引包含一堆有相似结构的文档数据。一般来讲，我们将数据类似一样或者相近的数据才包装为一个Index。(这个必须小写，也别用下划线开头)
-- **Document(文档):**ES存储内容的基本单位，相当于一条数据（在项目中，它可以是一条订单数据、一条JSON数据等等）。一条条的Document构成了整个的Index.
+- **Index(索引):**即索引，索引包含一堆有相似结构的文档数据。一般来讲，我们将数据类似一样或者相近的数据才包装为一个Index。就像是关系数据库中的一个Database(这个必须小写，也别用下划线开头)
+- **Document(文档):**ES存储内容的基本单位，相当于一条数据（在项目中，它可以是一条订单数据、一条JSON数据等等)
 - **Type(类型):**对Document的分类，在一个Index中，会根据一些特性的不同，建立不同的Type去进行逻辑数据分类。6.X以后的版本只允许有一个Type，这个需要注意.就像是关系数据库中的一个Table
 - **Field(字段):**每个文档包含多个字段,类似关系数据库中一个Table的列
 - **Shard(分片):**数据分片,一个index可能会存在于多个shard
@@ -49,6 +49,8 @@ Elasticsearch是一款稳定高效的分布式搜索和分析引擎,它的底层
 接着 使用如下命令启动Elasticsearch
 
 	./bin/elasticsearch
+
+> 后台启动命令  **./bin/elasticsearch -d**
 
 测试是否启动成功,打开另一个终端进行测试：访问链接 **http://localhost:9200/**,或使用curl命令:
 

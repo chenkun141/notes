@@ -1,8 +1,10 @@
 ## 常用Linux命令 ##
 ### 参考资料 ###
 [https://juejin.im/post/5ac04f206fb9a028d1413bf2](https://juejin.im/post/5ac04f206fb9a028d1413bf2)  
-[https://www.cnblogs.com/yjd_hycf_space/p/7730690.html](https://www.cnblogs.com/yjd_hycf_space/p/7730690.html)
+[https://www.cnblogs.com/yjd_hycf_space/p/7730690.html](https://www.cnblogs.com/yjd_hycf_space/p/7730690.html)  
 
+### vi文件下查找相关字符串 ###
+按esc键，输入/string回车，就能定位字符串string，按n定位下一个,N定位上一个 (string为需要匹配的字符串)
 ### java 相关命令 ###
 后台运行，并将相关日志输出到registercenter.log
 

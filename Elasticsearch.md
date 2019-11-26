@@ -23,12 +23,12 @@ Elasticsearch是一款稳定高效的分布式搜索和分析引擎,它的底层
 
 我们用一个表格来做类比,如下:
 	  
-	|Elasticsearch |	MySQL |  
-	|--|--|  
-	|Index|	Database|  
-	|Type|	Table|  
-	|Document|	Row|  
-	|Field	|Column|  
+|Elasticsearch |	MySQL |  
+|--|--|  
+|Index|	Database|  
+|Type|	Table|  
+|Document|	Row|  
+|Field	|Column|  
 
 
 ## 安装 ##
@@ -138,6 +138,7 @@ Elasticsearch是一款稳定高效的分布式搜索和分析引擎,它的底层
 		bootstrap.memory_lock: false
 		bootstrap.system_call_filter: false
 
+5. 安装es head 部分的错误参考网址进行解决
 
 ## 添加文档 ##
 下面,我们将创建一个存储电影信息的Document:  
@@ -154,35 +155,28 @@ Elasticsearch是一款稳定高效的分布式搜索和分析引擎,它的底层
 
 我们可以使用curl命令来执行上述操作:
 
-	curl -i -X PUT "localhost:9200/movie/adventure/1" -d '{"name": "Life of Pi", "actors": ["Suraj", "Irrfan"]}'
+	curl -H "Content-Type: application/json" -i -XPOST "localhost:9200/mv/adv/1" -d '{"name": "Life of Pi", "actors": ["Suraj", "Irrfan"]}'
 
-不过,本文推荐使用httpie,类似curl,但比curl更好用,将上面的命令换成httpie,如下:
-
-	http put :9200/movie/adventure/1 name="Life of Pi" actors:='["Suraj", "Irrfan"]'
 
 上面的命令结果如下:
 
-	HTTP/1.1 201 Created
-	Location: /movie/adventure/1
-	content-encoding: gzip
-	content-type: application/json; charset=UTF-8
-	transfer-encoding: chunked
-	
 	{
-	    "_id": "1",
-	    "_index": "movie",
-	    "_shards": {
-	        "failed": 0,
-	        "successful": 1,
-	        "total": 2
-	    },
-	    "_type": "adventure",
-	    "_version": 1,
-	    "created": true,
-	    "result": "created"
+	  "_index": "mv",
+	  "_type": "adv",
+	  "_id": "1",
+	  "_version": 1,
+	  "result": "created",
+	  "_shards": {
+	    "total": 2,
+	    "successful": 1,
+	    "failed": 0
+	  },
+	  "_seq_no": 1,
+	  "_primary_term": 1
 	}
 
-可以看到,我们已经成功创建一个_index的movie,_type为adventure,_id为1的文档.  
+可以看到,我们已经成功创建一个_index的mv,_type为adv,_id为1的文档.  
+> _id不填写,自动生成自增id,请求地址为 "localhost:9200/mv/adv"
 
 我们通过get请求来查看这个文档的信息:
 
@@ -190,87 +184,72 @@ Elasticsearch是一款稳定高效的分布式搜索和分析引擎,它的底层
 
 结果如下:
 
-	HTTP/1.1 200 OK
-	content-encoding: gzip
-	content-type: application/json; charset=UTF-8
-	transfer-encoding: chunked
-	
 	{
-	    "_id": "1",
-	    "_index": "movie",
-	    "_source": {
-	        "actors": [
-	            "Suraj",
-	            "Irrfan"
-	        ],
-	        "name": "Life of Pi"
-	    },
-	    "_type": "adventure",
-	    "_version": 1,
-	    "found": true
+		"_index": "mv",
+		"_type": "adv",
+		"_id": "1",
+		"_version": 1,
+		"_seq_no": 1,
+		"_primary_term": 1,
+		"found": true,
+		"_source": {
+			"name": "Life of Pi",
+			"actors": [
+				"Suraj"
+				,
+				"Irrfan"
+			]
+		}
 	}
 
 可以看到,原始的文档数据存在了_source字段中.
 
-如果我们的数据没有id,也可以让Elasticsearch自动为我们生成,此时要使用post请求,形式如下:
-
-	POST /movie/adventure/
-	{
-	    "name": "Life of Pi"
-	}
-
-## 更新整个文档 ##
+## 更新文档 ##
 当我们使用put方法指明文档的_index,_type和_id时,如果_id已存在,则新文档会替换旧文档,此时文档的_version会增加1,并且_created字段为false.比如:
 
-	http put :9200/movie/adventure/1 name="Life of Pi"
+	curl -H "Content-Type: application/json" -i -XPUT "localhost:9200/mv/adv/1" -d '{"name": "JACK AND ROSE"}'
 
 结果如下:
 
-	HTTP/1.1 200 OK
-	content-encoding: gzip
-	content-type: application/json; charset=UTF-8
-	transfer-encoding: chunked
-	
 	{
-	    "_id": "1",
-	    "_index": "movie",
-	    "_shards": {
-	        "failed": 0,
-	        "successful": 1,
-	        "total": 2
-	    },
-	    "_type": "adventure",
-	    "_version": 2,
-	    "created": false,
-	    "result": "updated"
+	  "_index": "mv",
+	  "_type": "adv",
+	  "_id": "1",
+	  "_version": 2,
+	  "result": "updated",
+	  "_shards": {
+	    "total": 2,
+	    "successful": 1,
+	    "failed": 0
+	  },
+	  "_seq_no": 2,
+	  "_primary_term": 1
 	}
 
 使用get请求查看新文档的数据:
 
-	http :9200/movie/adventure/1
+	curl -H "Content-Type: application/json" -i -XGET "localhost:9200/mv/adv/1"
 
 结果如下:
 
-	HTTP/1.1 200 OK
-	content-encoding: gzip
-	content-type: application/json; charset=UTF-8
-	transfer-encoding: chunked
-	
 	{
-	    "_id": "1",
-	    "_index": "movie",
-	    "_source": {
-	        "name": "Life of Pi"
-	    },
-	    "_type": "adventure",
-	    "_version": 2,
-	    "found": true
+	  "_index": "mv",
+	  "_type": "adv",
+	  "_id": "1",
+	  "_version": 2,
+	  "_seq_no": 2,
+	  "_primary_term": 1,
+	  "found": true,
+	  "_source": {
+	    "name": "JACK AND ROSE"
+	  }
 	}
 
 可以看到,actors这个字段已经不存在了,文档的_version变成了2.  
 因此,为了避免在误操作的情况下,原文档被替换,我们可以使用_create这个api,表示只在文档不存在的情况下才创建新文档(返回201 created),如果文档存在则不做任何操作(返回409 conflict),命令如下:
 
-	http put :9200/movie/adventure/1/_create name="Life of Pi"
+	curl -H "Content-Type: application/json" -i -XPUT "localhost:9200/mv/adv/1/_create" -d '{"name": "JACK AND ROSE"}'
+	
 
 由于文档id存在,会返回409 conflict.
 
@@ -280,49 +259,40 @@ Elasticsearch是一款稳定高效的分布式搜索和分析引擎,它的底层
 现在,待更新的文档信息如下:
 
 	{
-	    "_id": "1",
-	    "_index": "movie",
-	    "_source": {
-	        "name": "Life of Pi"
-	    },
-	    "_type": "adventure",
-	    "_version": 2,
-	    "found": true
+	  "_index": "mv",
+	  "_type": "adv",
+	  "_id": "1",
+	  "_version": 2,
+	  "_seq_no": 2,
+	  "_primary_term": 1,
+	  "found": true,
+	  "_source": {
+	    "name": "JACK AND ROSE"
+	  }
 	}
 
 最简单的update请求接受一个局部文档参数**doc**,它会合并到现有文档中:将对象合并在一起,存在的标量字段被覆盖,新字段被添加.
 
 形式如下:
 
-	POST /movie/adventure/1/_update
-	{
-	   "doc": {
-	      "name": "life of pi"
-	   }
-	}
+	curl -H "Content-Type: application/json" -i -XPOST "localhost:9200/mv/adv/1/_update" -d '{"doc": {"actors": ["Suraj", "Irrfan"]}}'
 
-由于有嵌套字段,我们可以这样使用http(这里需要注意使用post方法):
-
-	echo '{"doc": {"actors": ["Suraj", "Irrfan"]}}' | http post :9200/movie/adventure/1/_update
-
+	
 上面的命令中,我们添加了一个新的字段:actors,结果如下:
 
-	HTTP/1.1 200 OK
-	content-encoding: gzip
-	content-type: application/json; charset=UTF-8
-	transfer-encoding: chunked
-	
 	{
-	    "_id": "1",
-	    "_index": "movie",
-	    "_shards": {
-	        "failed": 0,
-	        "successful": 1,
-	        "total": 2
-	    },
-	    "_type": "adventure",
-	    "_version": 3,
-	    "result": "updated"
+	  "_index": "mv",
+	  "_type": "adv",
+	  "_id": "1",
+	  "_version": 3,
+	  "result": "updated",
+	  "_shards": {
+	    "total": 2,
+	    "successful": 1,
+	    "failed": 0
+	  },
+	  "_seq_no": 4,
+	  "_primary_term": 1
 	}
 
 可以看到,_version增加了1,result的结果是updated.
@@ -331,99 +301,109 @@ Elasticsearch是一款稳定高效的分布式搜索和分析引擎,它的底层
 ### 检索某个文档 ###
 要检索某个文档很简单,我们只需要使用get请求并指出文档的index,type,id就可以了,比如:
 
-	http :9200/movie/adventure/1/
+	curl -H "Content-Type: application/json" -i -XGET "localhost:9200/mv/adv/1"
 
 响应内容会包含文档的元信息,文档的原始数据存在_source字段中.  
 我们也可以直接检索出文档的_source字段,如下:  
 
-	http :9200/movie/adventure/1/_source
+	curl -H "Content-Type: application/json" -i -XGET "localhost:9200/mv/adv/1/_source"
 
 ### 检索所有文档 ###
 我们可以使用-search这个api检索出所有的文档,命令如下:
 
-	http :9200/movie/adventure/_search
+	curl -H "Content-Type: application/json" -i -XGET "localhost:9200/mv/adv/_search"
 
 返回结果如下:
 
 	{
-	    "_shards": {
-	        "failed": 0,
-	        "successful": 5,
-	        "total": 5
+	  "took": 1,
+	  "timed_out": false,
+	  "_shards": {
+	    "total": 1,
+	    "successful": 1,
+	    "skipped": 0,
+	    "failed": 0
+	  },
+	  "hits": {
+	    "total": {
+	      "value": 3,
+	      "relation": "eq"
 	    },
-	    "hits": {
-	        "hits": [
-	            {
-	                "_id": "1",
-	                "_index": "movie",
-	                "_score": 1.0,
-	                "_source": {
-	                    "actors": [
-	                        "Suraj",
-	                        "Irrfan"
-	                    ],
-	                    "name": "Life of Pi"
-	                },
-	                "_type": "adventure"
-	            }
-	        ],
-	        "max_score": 1.0,
-	        "total": 1
-	    },
-	    "timed_out": false,
-	    "took": 299
+	    "max_score": 1,
+	    "hits": [
+	      {
+	        "_index": "mv",
+	        "_type": "adv",
+	        "_id": "eCNNpG4B2qkb5WRgughp",
+	        "_score": 1,
+	        "_source": {
+	          "name": "Life of Pi",
+	          "actors": [
+	            "Suraj",
+	            "Irrfan"
+	          ]
+	        }
+	      },
+	      {
+	        "_index": "mv",
+	        "_type": "adv",
+	        "_id": "2",
+	        "_score": 1,
+	        "_source": {
+	          "name": "JACK AND ROSE"
+	        }
+	      },
+	      {
+	        "_index": "mv",
+	        "_type": "adv",
+	        "_id": "1",
+	        "_score": 1,
+	        "_source": {
+	          "name": "JACK AND ROSE",
+	          "actors": [
+	            "Suraj",
+	            "Irrfan"
+	          ]
+	        }
+	      }
+	    ]
+	  }
 	}
 
 可以看到,hits这个object包含了hits数组,total等字段,其中,hits数组包含了所有的文档,这里只有一个文档,total表明了文档的数量,默认情况下会返回前10个结果.我们也可以设定**from/size**参数来获取某一范围的文档 比如:
 
-	http :9200/movie/adventure/_search?from=1&size=5
+	curl -H "Content-Type: application/json" -i -XGET "localhost:9200/mv/adv/_search?from=1&size=5"
 
 当不指定from和size时,会使用默认值,其中from的默认值是0,size的默认值是10.
 
 ### 检索某些字段 ###
 有时候,我们只需检索文档的个别字段,这时可以使用**_source**参数,多个子弹可以使用逗号分隔,如下所示:
 
-	http :9200/movie/adventure/1?_source=name
-	http :9200/movie/adventure/1?_source=name,actors
+	curl -H "Content-Type: application/json" -i -XGET "localhost:9200/mv/adv/1?_source=name"
+
+	curl -H "Content-Type: application/json" -i -XGET "localhost:9200/mv/adv/1?_source=name,actors"
 
 ### query string 搜索 ###
 query string 搜索以**q=field:value**的形式进行查询,比如查询name字段含有life的电影:
 
-	http :9200/movie/adventure/_search?q=name:life
+	curl -H "Content-Type: application/json" -i -XGET "localhost:9200/mv/adv/_search?q=name:JACK"
 
 ### DSL搜索 ###
 上面的query string搜索比较轻量级,只适用于简单的场合.Elasticsearch提供了更为强大的DSL(Domain Specific Language)查询语言,适用于复杂的搜索场景,比如全文搜索.我们可以将上面的query string 搜索转换为DSL搜索,如下:
 
-	GET /movie/adventure/_search
-	{
-	    "query" : {
-	        "match" : {
-	            "name" : "life"
-	        }
-	    }
-	}
-
-如果使用httpie,可以这样:
-
-	echo '{"query": {"match": {"name": "life"}}}' | http get :9200/movie/adventure/_search
-
-如果使用curl,可以这样:
-
-	curl -X GET "127.0.0.1:9200/movie/adventure/_search" -d '{"query": {"match": {"name": "life"}}}'
+	curl -H "Content-Type: application/json" -i -XGET "localhost:9200/mv/adv/_search" -d '{"query" : {"match" : {"name" : "JACK"}}}'
 
 ## 文档是否存在 ##
 使用head方法查看文档是否存在:
 
-	http head :9200/movie/adventure/1
+	curl -H "Content-Type: application/json" -i -XHEAD "localhost:9200/mv/adv/2"	
 
 如果文档存在则返回200,否则返回404.
 
 ## 删除文档 ##
 使用delete方法删除文档:
 
-	http delete :9200/movie/adventure/1
-
-
+	curl -H "Content-Type: application/json" -i -XDELETE "localhost:9200/mv/adv/2"
 
 ## 小结 ##
 - Elasticsearch通过简单的Restful api 来隐藏lucene的复杂性,从而让全文搜索变得简单

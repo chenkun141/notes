@@ -108,7 +108,7 @@ abbitMQ 相关的 API 与 AMQP 紧密相连，比如 channel.basicPublish 对应
 ### RabbitMQ中virtual host(vhost)的作用   ###
 vhost可以理解为虚拟broker即mini-RabbitMQ server。其内部均含有独立的queue、exchange和binding等，但最最重要的是，其拥有独立的权限系统，可以做到vhost范围的用户控制。当然，从RabbitMQ的全局角度，vhost可以作为不同权限隔离的手段(一个典型的例子就是不同的应用可以跑在不同的vhost中)
 
-### rabbitmq 怎么保证消息的稳定性 ###
+### Rabbitmq 怎么保证消息的稳定性 ###
 通过将channel设置为confirm(确认)模式,保证消息的稳定性
 
 ## Exchange Types(RabbitMQ广播类型) ##

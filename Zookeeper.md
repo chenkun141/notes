@@ -4,7 +4,8 @@ ZooKeeper是一个开源的分布式服务协调组件,是Google Chubby的开源
 ### 参考网站 ###
 [https://www.cnblogs.com/yuyijq/p/3391945.html](https://www.cnblogs.com/yuyijq/p/3391945.html)  
 [https://draveness.me/zookeeper-chubby](https://draveness.me/zookeeper-chubby)  
-[https://juejin.im/post/5b03d58a6fb9a07a9e4d8f01](https://juejin.im/post/5b03d58a6fb9a07a9e4d8f01)
+[https://juejin.im/post/5b03d58a6fb9a07a9e4d8f01](https://juejin.im/post/5b03d58a6fb9a07a9e4d8f01)  
+[https://www.cnblogs.com/wlwl/p/10715065.html](https://www.cnblogs.com/wlwl/p/10715065.html)
 
 ### ZooKeeper基本概念 ###
 #### 角色 ####

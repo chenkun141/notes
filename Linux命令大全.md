@@ -8,7 +8,7 @@
 ### java 相关命令 ###
 后台运行，并将相关日志输出到registercenter.log
 
-	java -jar liguregistercenter-1.0.1-SNAPSHOT.jar >/data/project/ligusports/logs/registercenter/registercenter.log &
+	java -jar liguregistercenter-1.0.1-SNAPSHOT.jar >/data/project/ligu/logs/registercenter/registercenter.log &
 
 
 ### 文件编辑 ###

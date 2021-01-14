@@ -283,7 +283,10 @@ more file1 查看一个长文件的内容
 less file1 类似于 'more' 命令，但是它允许在文件中和正向操作一样的反向操作  
 head -2 file1 查看一个文件的前两行  
 tail -2 file1 查看一个文件的最后两行  
-tail -f /var/log/messages 实时查看被添加到一个文件中的内容  
+tail -f /var/log/messages 实时查看被添加到一个文件中的内容
+看上下10行：grep -C 10 'NullPointerException' logback.log
+看上面10行：grep -B 10 'NullPointerException' logback.log
+看下面10行：grep -A 10 'NullPointerException' logback.log 
 
 
 

@@ -4,7 +4,7 @@
 2. 搜索描述 in:description xxx
 3. 搜索readme in:readme xxx
 4. 按stars stars:>2000 
-5. 按forkfork:>3000
+5. 按fork fork:>3000
 6. 仓库大小搜索 size:>=5000   [说明5000大小是5000k, 5m]
 7. 按更新时间 pushed:>2020-01-01 
 8. 按语言language: xxx

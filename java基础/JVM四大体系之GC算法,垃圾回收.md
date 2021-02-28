@@ -44,6 +44,7 @@ GC分代的基本假设：绝大部分对象的生命周期都非常短暂，存
 
 “分代收集”（Generational Collection）算法，把Java堆分为新生代和老年代，这样就可以根据各个年代的特点采用最适当的收集算法。在**新生代**中，每次垃圾收集时都发现有大批对象死去，只有少量存活，那就选用**复制**算法，只需要付出少量存活对象的复制成本就可以完成收集。而**老年代**中因为对象存活率高、没有额外空间对它进行分配担保，就必须使用**“标记-清理”或“标记-整理”**算法来进行回收。
 
+
 ## 垃圾收集器 ##
 > 如果说收集算法是内存回收的方法论,垃圾收集器就是内存回收的具体实现
 
@@ -118,10 +119,9 @@ G1的新生代收集跟ParNew类似，当新生代占用达到一定比例的时
 
 ## 常用收集器组合 ##
 
-
 	|服务器 |  新生代GC策略 | 老年老代GC策略   |  说明|  
-	|  :----  | :----  | :----  | :----  |
-	|组合1	|   Serial	|    Serial Old	   |  Serial和Serial Old都是单线程进行GC，特点就是GC时暂停所有应用线程。|
+	| :---- | :---- | :---- | :---- |
+	|组合1	|   Serial	|   Serial Old	|  Serial和Serial Old都是单线程进行GC，特点就是GC时暂停所有应用线程。|
 	|组合2	  | Serial	|    CMS+Serial Old	| CMS（Concurrent Mark Sweep）是并发GC，实现GC线程和应用线程并发工作，不需要暂停所有应用线程。另外，当CMS进行GC失败时，会自动使用Serial Old策略进行GC。|
 	|组合3	 |  ParNew		|	CMS		| 	 使用-XX:+UseParNewGC选项来开启。ParNew是Serial的并行版本，可以指定GC线程数，默认GC线程数为CPU的数量。可以使用-XX:ParallelGCThreads选项指定GC的线程数。如果指定了选项-XX:+UseConcMarkSweepGC选项，则新生代默认使用ParNew GC策略。|
 	|组合4	|	ParNew	|	Serial Old	|	 使用-XX:+UseParNewGC选项来开启。新生代使用ParNew GC策略，年老代默认使用Serial Old GC策略。|

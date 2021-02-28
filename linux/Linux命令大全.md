@@ -426,6 +426,7 @@ host www.example.com lookup hostname to resolve name to ip address and viceversa
 nslookup www.example.com lookup hostname to resolve name to ip address and viceversa  
 whois www.example.com lookup on Whois database  
 
+
 ### 1.查找文件 ###
 根据名称查找/目录下的filename.txt文件。
 	

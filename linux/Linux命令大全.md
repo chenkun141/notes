@@ -426,68 +426,6 @@ host www.example.com lookup hostname to resolve name to ip address and viceversa
 nslookup www.example.com lookup hostname to resolve name to ip address and viceversa  
 whois www.example.com lookup on Whois database  
 
- 
-
-### JPS工具 ###
-
-jps(Java Virtual Machine Process Status Tool)是JDK 1.5提供的一个显示当前所有java进程pid的命令，简单实用，非常适合在linux/unix平台上简单察看当前java进程的一些简单情况。
-
-   	我想很多人都是用过unix系统里的ps命令，这个命令主要是用来显示当前系统的进程情况，有哪些进程，及其 id。 jps 也是一样，它的作用是显示当前系统的java进程情况，及其id号。我们可以通过它来查看我们到底启动了几个java进程（因为每一个java程序都会独占一个java虚拟机实例），和他们的进程号（为下面几个程序做准备），并可通过opt来查看这些进程的详细启动参数。
-
-     使用方法：在当前命令行下打 jps(需要JAVA_HOME，没有的话，到改程序的目录下打) 。
-
-jps存放在JAVA_HOME/bin/jps，使用时为了方便请将JAVA_HOME/bin/加入到Path.
-
-$> jps 
-23991 Jps  
-23789 BossMain  
-23651 Resin  
-
- 
-### 比较常用的参数： ###
-
--q 只显示pid，不显示class名称,jar文件名和传递给main 方法的参数  
-$>  jps -q  
-28680  
-23789  
-23651  
-
--m 输出传递给main 方法的参数，在嵌入式jvm上可能是null  
-
-$> jps -m  
-28715 Jps -m  
-23789 BossMain  
-23651 Resin -socketwait 32768 -stdout /data/aoxj/resin/log/stdout.log -stderr /data/aoxj/   resin/log/stderr.log   
-
--l 输出应用程序main class的完整package名 或者 应用程序的jar文件完整路径名
-
-$> jps -l    
-28729 sun.tools.jps.Jps  
-23789 com.asiainfo.aimc.bossbi.BossMain  
-23651 com.caucho.server.resin.Resin  
-
--v 输出传递给JVM的参数
-
-$> jps -v  
-23789 BossMain  
-28802 Jps -Denv.class.path=/data/aoxj/bossbi/twsecurity/java/trustwork140.jar:/data/aoxj/bossbi/twsecurity/java/:/data/aoxj/bossbi/twsecurity/java/twcmcc.jar:/data/aoxj/jdk15/lib/rt.jar:/data/aoxj/jd
-
-k15/lib/tools.jar -Dapplication.home=/data/aoxj/jdk15 -Xms8m  
-23651 Resin -Xss1m -Dresin.home=/data/aoxj/resin -Dserver.root=/data/aoxj/resin -Djava.util.logging.manager=com.caucho.log.LogManagerImpl -
-
-Djavax.management.builder.initial=com.caucho.jmx.MBeanServerBuilderImpl  
-
-sudo jps看到的进程数量最全  
-
-jps 192.168.0.77  
-
-列出远程服务器192.168.0.77机器所有的jvm实例，采用rmi协议，默认连接端口为1099  
-
-（前提是远程服务器提供jstatd服务）  
-
-注：jps命令有个地方很不好，似乎只能显示当前用户的java进程，要显示其他用户的还是只能用unix/linux的ps命令。 
-
-   
 ### 1.查找文件 ###
 根据名称查找/目录下的filename.txt文件。
 	

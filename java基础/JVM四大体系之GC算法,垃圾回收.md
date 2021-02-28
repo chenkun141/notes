@@ -24,7 +24,7 @@ jvm体系总体分四大块:
 - 本地方法栈中JNI引用的对象
 
 ## 垃圾收集算法 ##
-### 标记-清楚算法 ###
+### 标记-清除算法 ###
 “标记-清除”（Mark-Sweep）算法，如它的名字一样，算法分为“标记”和“清除”两个阶段：首先标记出所有需要回收的对象，在标记完成后统一回收掉所有被标记的对象。之所以说它是最基础的收集算法，是因为后续的收集算法都是基于这种思路并对其缺点进行改进而得到的。
 
 它的主要缺点有两个：一个是效率问题，标记和清除过程的效率都不高；另外一个是空间问题，标记清除之后会产生大量不连续的内存碎片，空间碎片太多可能会导致，当程序在以后的运行过程中需要分配较大对象时无法找到足够的连续内存而不得不提前触发另一次垃圾收集动作.  
@@ -42,7 +42,7 @@ jvm体系总体分四大块:
 ### 分代收集算法 ###
 GC分代的基本假设：绝大部分对象的生命周期都非常短暂，存活时间短。
 
-“分代收集”（Generational Collection）算法，把Java堆分为新生代和老年代，这样就可以根据各个年代的特点采用最适当的收集算法。在新生代中，每次垃圾收集时都发现有大批对象死去，只有少量存活，那就选用复制算法，只需要付出少量存活对象的复制成本就可以完成收集。而老年代中因为对象存活率高、没有额外空间对它进行分配担保，就必须使用“标记-清理”或“标记-整理”算法来进行回收。
+“分代收集”（Generational Collection）算法，把Java堆分为新生代和老年代，这样就可以根据各个年代的特点采用最适当的收集算法。在**新生代**中，每次垃圾收集时都发现有大批对象死去，只有少量存活，那就选用**复制**算法，只需要付出少量存活对象的复制成本就可以完成收集。而**老年代**中因为对象存活率高、没有额外空间对它进行分配担保，就必须使用**“标记-清理”或“标记-整理”**算法来进行回收。
 
 ## 垃圾收集器 ##
 > 如果说收集算法是内存回收的方法论,垃圾收集器就是内存回收的具体实现
@@ -118,13 +118,14 @@ G1的新生代收集跟ParNew类似，当新生代占用达到一定比例的时
 
 ## 常用收集器组合 ##
 
-	服务器 |  新生代GC策略 | 老年老代GC策略   |                        说明                   |  
-	 ------|  ---------- |---------------- | --------------------------------------------------|  
-	组合1	   Serial	    Serial Old	     Serial和Serial Old都是单线程进行GC，特点就是GC时暂停所有应用线程。
-	组合2	   Serial	    CMS+Serial Old	 CMS（Concurrent Mark Sweep）是并发GC，实现GC线程和应用线程并发工作，不需要暂停所有应用线程。另外，当CMS进行GC失败时，会自动使用Serial Old策略进行GC。
-	组合3	   ParNew			CMS		 	 使用-XX:+UseParNewGC选项来开启。ParNew是Serial的并行版本，可以指定GC线程数，默认GC线程数为CPU的数量。可以使用-XX:ParallelGCThreads选项指定GC的线程数。如果指定了选项-XX:+UseConcMarkSweepGC选项，则新生代默认使用ParNew GC策略。
-	组合4		ParNew		Serial Old		 使用-XX:+UseParNewGC选项来开启。新生代使用ParNew GC策略，年老代默认使用Serial Old GC策略。
-	组合5	Parallel Scavenge	Serial Old	 Parallel Scavenge策略主要是关注一个可控的吞吐量：应用程序运行时间 / (应用程序运行时间 + GC时间)，可见这会使得CPU的利用率尽可能的高，适用于后台持久运行的应用程序，而不适用于交互较多的应用程序。
-	组合6	Parallel Scavenge	Parallel Old Parallel Old是Serial Old的并行版本
-	组合7		G1GC			G1GC		 -XX:+UnlockExperimentalVMOptions   -XX:+UseG1GC #开启；-XX:MaxGCPauseMillis =50 #暂停时间目标；-XX:GCPauseIntervalMillis =200 #暂停间隔目标；-XX:+G1YoungGenSize=512m #年轻代大小；-XX:SurvivorRatio=6 #幸存区比例
+
+	|服务器 |  新生代GC策略 | 老年老代GC策略   |  说明|  
+	|  :----  | :----  | :----  | :----  |
+	|组合1	|   Serial	|    Serial Old	   |  Serial和Serial Old都是单线程进行GC，特点就是GC时暂停所有应用线程。|
+	|组合2	  | Serial	|    CMS+Serial Old	| CMS（Concurrent Mark Sweep）是并发GC，实现GC线程和应用线程并发工作，不需要暂停所有应用线程。另外，当CMS进行GC失败时，会自动使用Serial Old策略进行GC。|
+	|组合3	 |  ParNew		|	CMS		| 	 使用-XX:+UseParNewGC选项来开启。ParNew是Serial的并行版本，可以指定GC线程数，默认GC线程数为CPU的数量。可以使用-XX:ParallelGCThreads选项指定GC的线程数。如果指定了选项-XX:+UseConcMarkSweepGC选项，则新生代默认使用ParNew GC策略。|
+	|组合4	|	ParNew	|	Serial Old	|	 使用-XX:+UseParNewGC选项来开启。新生代使用ParNew GC策略，年老代默认使用Serial Old GC策略。|
+	|组合5	|Parallel Scavenge|	Serial Old|	 Parallel Scavenge策略主要是关注一个可控的吞吐量：应用程序运行时间 / (应用程序运行时间 + GC时间)，可见这会使得CPU的利用率尽可能的高，适用于后台持久运行的应用程序，而不适用于交互较多的应用程序。|
+	|组合6	|Parallel Scavenge|	Parallel Old |Parallel Old是Serial Old的并行版本|
+	|组合7	|	G1GC	|		G1GC	|	 -XX:+UnlockExperimentalVMOptions   -XX:+UseG1GC #开启；-XX:MaxGCPauseMillis =50 #暂停时间目标；-XX:GCPauseIntervalMillis =200 #暂停间隔目标；-XX:+G1YoungGenSize=512m #年轻代大小；-XX:SurvivorRatio=6 #幸存区比例|
 
